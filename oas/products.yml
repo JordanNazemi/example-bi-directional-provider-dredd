@@ -81,7 +81,7 @@ paths:
               examples:
                 application/json:
                   value:
-                    true
+                    message: string
         "400":
           description: Invalid ID supplied
           content: {}
