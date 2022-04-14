@@ -17,8 +17,8 @@ exports.getById = async (req, res) => {
     product ? res.send(product) : res.status(404).send({message: "Product not found"})
 };
 exports.deleteById = async (req, res) => {
-    const product = await repository.deleteById(req.params.id);
-    response ? res.send({message: `${req.params.id} deleted`}) : res.status(404).send({message: "Product not found"}) // Maybe not the correct line here
+    const response = await repository.deleteById(req.params.id);
+    response ? res.send({message: `${req.params.id} deleted`}) : res.status(404).send({message: "Product not found"})
 };
 
 exports.repository = repository;
