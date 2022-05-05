@@ -183,3 +183,55 @@ You can still try this example locally on Windows using powershell and running c
 ## Found an issue?
 
 Reach out via a GitHub Issue, or reach us over in the [Pact foundation Slack](https://slack.pact.io)
+
+
+
+Presentation:
+Pact Demo
+
+Intro
+So here we have a very basic site frontend and backend. We’ve got a Master branch, a dev branch we’ve created from it, and a feature branch title ‘delete-product’ on both repos. 
+We’re going to start up both of them.
+Run ‘npm start’ for both of them
+A front end catalog, and a product detail page.
+While it all seems to be working, we’d like contract test the relationship between these two services. Lets start, as one should, with the backend.
+
+Backend Section
+To test the backend provider all we need to do is make sure that the OpenAPI spec we have written is fulfilled as expected by the service. 
+I need to meet with Holly about our current usage of API testing tools (and change this repo to match it) but when developing this I picked Dredd.
+We’re going to run make test which will run Dredd against our OAS defined here. 
+Run ‘make test’
+Once it runs, the results will be outputted to output/report.md. This is the document that’ll be uploaded to Pact
+We know the oas is green, so lets mimic the CI process in our terminal before we see it run in Github. It’s going to run the tests again, publish the results, check can-i-deploy (which will pass, since there is no existing consumer YET), then mark it as ‘deployed to production’
+See the Pactflow entry for it has appeared.
+
+Frontend Section
+Now, lets look at doing the same for our frontend.
+For frontend testing things are a little more involved, we need to create Cypress tests that mock the provider for each endpoint we tested in the OAS. We do this by using the Pact Cypress adapter.
+Shows the cypress tests under cypress/integrations/
+Now were going to run these tests.
+Run ‘make test’
+Now that the tests all pass we know its working on this end, now we just have to make sure that the resultant pact file from this, viewable here:
+See cypress/pacts
+…Is compatible with the report.md we posted to Pactflow. So we’ll do what we did before and mimic the deployment pipeline.
+THis will run the tests, publish the results, check can-i-deploy then record a deployment to production if alls green.
+Run make fake_ci
+We can see in Pact now that this contract is valid and fullfilled. 
+Were going to very quickly do that again for dev, but we’ll do by running the pipeline in Github Actions (which triggers on a commit aswell)
+
+Feature branch
+So thats the process on a working provider and consumers, let imagine were adding a new feature branch that will allow us to delete products. As would be the case in development, lets work from the backend forward. Here’s the backend branch, you can see we’ve added a new entry to the OAS and a new API route. Let me start the service and show the functionality
+Run “npm start” then use the delete product Postman request
+Now, as before we always want to start with testing this ourselves locally. 
+Run ‘make test’
+All the tests are passing, so lets commit this to our branch. This will start the pipeline for it and will can-i-deploy check it against the Dev consumer (but wont record a deployment, since its a feature branch)
+Show makefile
+While thats running, lets check the consumer equivalent
+
+Feature Consumer branch
+Here we’ve added an extra section to the product page cypress test to accomodate our new functionality. Let’s run our backend  and front end see how its supposed to work.
+Run npm start for both
+Now we run the tests and hope they pass. Which they do! Now let’s make a commit to this branch. Like the provider it will run the test, publish results, then can-i-deploy. Howeber, this time it will fail since its testing against the dev provider, which lacks the functionality its expecting. To test against the OTHER feature branch we run:
+First lets look at what wiill hapen in the deployment we just made. Run make can_i_deploy. it will fail
+Now run make ‘dev_can_i_deploy” which will pass
+Now all we need to do is merge the provider delete-product into dev, wait for it to record deployment, THEN merge in the consumer delete-product.
