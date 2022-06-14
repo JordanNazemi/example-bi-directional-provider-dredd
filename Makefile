@@ -78,7 +78,7 @@ can_i_deploy: .env
 
 deploy_app:
 	@echo "\n========== STAGE: deploy 🚀 ==========\n"
-	@echo "Deploying to prod"
+	@echo "Deploying"
 
 record_deployment: .env
 	@"${PACT_CLI}" broker record_deployment --pacticipant ${PACTICIPANT} --version ${GIT_COMMIT} --environment ${DEPLOY_ENV}
