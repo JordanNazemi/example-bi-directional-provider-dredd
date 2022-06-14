@@ -13,6 +13,7 @@ else ifeq ($(GIT_BRANCH), dev)
 	DEPLOY_ENV=development
 else
 	DEPLOY_TARGET=no_deploy
+	DEPLOY_ENV=development
 endif
 
 all: test
